@@ -1,5 +1,6 @@
 import './App.css';
 import React, { useState } from "react";
+import { MetaForm } from "./components/MetaForm";
 import { LaneList } from "./components/LaneList";
 import { StepList } from "./components/StepList";
 import { MermaidDiagram } from "./components/MermaidDiagram";
@@ -7,12 +8,18 @@ import { Lane, Step } from "./types";
 import { uid, esc } from "./utils";
 
 export default function App() {
+  // Meta information
+  const [processName, setProcessName] = useState("");
+  const [goal, setGoal] = useState("");
+  const [trigger, setTrigger] = useState("");
+  
   const [lanes, setLanes] = useState<Lane[]>([]);
   const [newLaneName, setNewLaneName] = useState("");
   const [steps, setSteps] = useState<Step[]>([]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<string[]>([]);
   const [mermaidSrc, setMermaidSrc] = useState("");
+  const [isGenerated, setIsGenerated] = useState(false);
 
   // Lane Handlers
   const addLane = () => {
@@ -58,8 +65,41 @@ export default function App() {
     setOverIndex(null);
   };
 
-  // Mermaid diagram generation
-  React.useEffect(() => {
+  // Generate diagram
+  const generateDiagram = () => {
+    // Validate required fields
+    const newTouched = { ...touched };
+    let hasErrors = false;
+
+    if (!processName) {
+      newTouched.processName = true;
+      hasErrors = true;
+    }
+    if (!goal) {
+      newTouched.goal = true;
+      hasErrors = true;
+    }
+    if (!trigger) {
+      newTouched.trigger = true;
+      hasErrors = true;
+    }
+    if (lanes.length === 0) {
+      newTouched.lanes = true;
+      hasErrors = true;
+    }
+    if (steps.length === 0) {
+      hasErrors = true;
+    }
+
+    setTouched(newTouched);
+
+    if (hasErrors) {
+      setErrors(["Please fill in all required fields and add at least one lane and one step."]);
+      return;
+    }
+
+    setErrors([]);
+
     if (lanes.length && steps.length) {
       const rows = steps.map(
         (step) =>
@@ -71,10 +111,28 @@ export default function App() {
     } else {
       setMermaidSrc("");
     }
-  }, [lanes, steps]);
+    
+    setIsGenerated(true);
+  };
 
   return (
     <div className="wrap">
+      <header className="header">
+        <h1>Process Designer</h1>
+        <p>Create beautiful process diagrams with swimlanes</p>
+      </header>
+
+      <MetaForm
+        processName={processName}
+        setProcessName={setProcessName}
+        goal={goal}
+        setGoal={setGoal}
+        trigger={trigger}
+        setTrigger={setTrigger}
+        touched={touched}
+        markTouched={markTouched}
+      />
+
       <LaneList
         lanes={lanes}
         newLaneName={newLaneName}
@@ -101,7 +159,17 @@ export default function App() {
         handleDragEnd={handleDragEnd}
       />
 
-      <MermaidDiagram mermaidSrc={mermaidSrc} setErrors={setErrors} />
+      <section className="card generate-section">
+        <button 
+          className="btn generate-btn" 
+          onClick={generateDiagram}
+          disabled={!processName || !goal || !trigger || lanes.length === 0 || steps.length === 0}
+        >
+          Generate Process Diagram
+        </button>
+      </section>
+
+      {isGenerated && <MermaidDiagram mermaidSrc={mermaidSrc} setErrors={setErrors} />}
 
       {errors.length > 0 && (
         <div className="error-list">

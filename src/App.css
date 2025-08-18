@@ -5,6 +5,26 @@ body {
   padding: 0;
 }
 
+.header {
+  text-align: center;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-bottom: 0;
+}
+
+.header h1 {
+  margin: 0 0 8px 0;
+  font-size: 2.5em;
+  font-weight: 600;
+}
+
+.header p {
+  margin: 0;
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
 .card {
   background: #fff;
   border-radius: 8px;
@@ -12,6 +32,36 @@ body {
   margin: 24px auto;
   padding: 24px;
   max-width: 600px;
+}
+
+.generate-section {
+  text-align: center;
+}
+
+.generate-btn {
+  font-size: 1.1em;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn:disabled {
+  background: #d1d7e0;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .sec-hdr {
@@ -29,6 +79,16 @@ body {
 .hint {
   font-size: 0.95em;
   color: #888;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.grid2 .full {
+  grid-column: 1 / -1;
 }
 
 .row {
@@ -133,9 +193,15 @@ body {
     max-width: 98vw;
     padding: 12px;
   }
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
   .row {
     flex-direction: column;
     gap: 6px;
+  }
+  .header h1 {
+    font-size: 2em;
   }
 }
 
