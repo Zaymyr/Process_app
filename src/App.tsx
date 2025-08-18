@@ -1,10 +1,10 @@
+import './App.css';
 import React, { useState } from "react";
 import { LaneList } from "./components/LaneList";
 import { StepList } from "./components/StepList";
 import { MermaidDiagram } from "./components/MermaidDiagram";
 import { Lane, Step } from "./types";
 import { uid, esc } from "./utils";
-import './App.css';
 
 export default function App() {
   const [lanes, setLanes] = useState<Lane[]>([]);
@@ -27,7 +27,7 @@ export default function App() {
   // Step Handlers
   const addStep = () => {
     if (lanes.length)
-      setSteps([...steps, { id: uid("step"), label: "", laneId: "" }]);
+      setSteps([...steps, { id: uid("step"), label: "", laneId: lanes[0].id }]);
   };
   const updateStep = (i: number, patch: Partial<Step>) => {
     setSteps((ss) =>
@@ -35,7 +35,7 @@ export default function App() {
     );
   };
 
-  // Drag & drop logic for steps (implement as needed)
+  // Drag & drop logic for steps
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const handleDragStart = (i: number) => () => setDragIndex(i);
@@ -58,9 +58,8 @@ export default function App() {
     setOverIndex(null);
   };
 
-  // Mermaid diagram generation (implement your logic as needed)
+  // Mermaid diagram generation
   React.useEffect(() => {
-    // Example: Build a mermaid diagram string from steps and lanes
     if (lanes.length && steps.length) {
       const rows = steps.map(
         (step) =>
@@ -75,7 +74,7 @@ export default function App() {
   }, [lanes, steps]);
 
   return (
-    <div>
+    <div className="wrap">
       <LaneList
         lanes={lanes}
         newLaneName={newLaneName}
