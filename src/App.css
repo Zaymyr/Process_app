@@ -3,14 +3,25 @@ body {
   background: #f8f9fa;
   margin: 0;
   padding: 0;
+  height: 100%;                 /* occupe tout l'écran */
 }
 
+#root, .wrap {
+  width: 100%;                  /* largeur totale */
+  max-width: 100% !important;   /* override */
+  margin: 0 auto;
+  padding: 16px 24px;
+  box-sizing: border-box;
+}
+
+/* En-tête pleine largeur */
 .header {
   text-align: center;
   padding: 32px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   margin-bottom: 0;
+  width: 100%;
 }
 
 .header h1 {
@@ -25,13 +36,16 @@ body {
   opacity: 0.9;
 }
 
+/* Cartes fluides */
 .card {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  margin: 24px auto;
+  margin: 24px 0;
   padding: 24px;
-  max-width: 600px;
+  width: 100%;                  /* force pleine largeur */
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
 .generate-section {
@@ -49,6 +63,8 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  width: 100%;                  /* bouton large */
+  max-width: 420px;             /* limite si tu veux éviter full-bleed */
 }
 
 .generate-btn:hover:not(:disabled) {
@@ -64,133 +80,22 @@ body {
   box-shadow: none;
 }
 
-.sec-hdr {
-  display: flex;
-  align-items: center;
-  gap: 1em;
-  margin-bottom: 1em;
+/* Diagramme responsive */
+.mermaid {
+  display: block;
+  width: 100%;
+  overflow-x: auto;    /* scroll si trop large */
+}
+.mermaid svg {
+  width: 100% !important;
+  height: auto !important;
 }
 
-.sec-hdr h3 {
-  margin: 0;
-  font-size: 1.2em;
-}
+/* … (garde le reste de tes classes telles quelles) … */
 
-.hint {
-  font-size: 0.95em;
-  color: #888;
-}
-
-.grid2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.grid2 .full {
-  grid-column: 1 / -1;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.field label {
-  font-size: 0.98em;
-}
-
-.field input,
-.field select {
-  font-size: 1em;
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.field.error input,
-.field.error select {
-  border-color: #e53e3e;
-  background: #ffeded;
-}
-
-.field .required:after {
-  content: ' *';
-  color: #e53e3e;
-  font-weight: bold;
-}
-
-.btn {
-  padding: 6px 16px;
-  border-radius: 4px;
-  font-size: 1em;
-  background: #4278f5;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.2s;
-}
-
-.btn.ghost {
-  background: #f5f6fa;
-  color: #333;
-  border: 1px solid #e3e6ef;
-}
-
-.btn.danger {
-  background: #e53e3e;
-  color: #fff;
-}
-
-.btn:disabled {
-  background: #d1d7e0;
-  color: #888;
-  cursor: not-allowed;
-}
-
-.grab {
-  cursor: grab;
-  font-size: 1.3em;
-  background: #f5f6fa;
-  border-radius: 4px;
-  padding: 2px 8px;
-}
-
-.dnd.dragging {
-  opacity: 0.5;
-  background: #e3e6ef;
-}
-
-.dnd.over {
-  border: 2px dashed #4278f5;
-}
-
-.error-list {
-  margin: 20px auto;
-  max-width: 600px;
-}
-
-.error {
-  color: #e53e3e;
-  background: #fff0f0;
-  border: 1px solid #e53e3e;
-  border-radius: 4px;
-  padding: 8px;
-  margin-bottom: 4px;
-}
-
+/* Responsive mobile */
 @media (max-width: 700px) {
   .card {
-    max-width: 98vw;
     padding: 12px;
   }
   .grid2 {
@@ -204,63 +109,3 @@ body {
     font-size: 2em;
   }
 }
-
-
-/* ===== Hard overrides to align controls (placed LAST) ===== */
-:root { --control-h: 40px; --control-r: 10px; }
-
-.wrap .row.dnd {
-  display: grid;
-  grid-template-columns: 40px 1fr 220px auto;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-/* Inputs/selects — exact same box sizing */
-.wrap input.ctl, .wrap select.ctl {
-  height: var(--control-h) !important;
-  line-height: var(--control-h) !important;
-  padding: 0 12px !important;              /* vertical padding = 0 */
-  border-radius: var(--control-r) !important;
-  box-sizing: border-box !important;
-  font-size: 14px !important;
-}
-
-/* Normalize select arrow (optional) */
-.wrap select.ctl {
-  -webkit-appearance: none; -moz-appearance: none; appearance: none;
-  background-color: #fff;
-  background-image:
-    linear-gradient(45deg, transparent 50%, #94a3b8 50%),
-    linear-gradient(135deg, #94a3b8 50%, transparent 50%);
-  background-position: right 12px center, right 6px center;
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  padding-right: 28px !important;
-}
-
-/* Buttons — same height */
-.wrap .btn {
-  height: var(--control-h) !important;
-  line-height: var(--control-h) !important;
-  padding: 0 14px !important;
-  border-radius: var(--control-r) !important;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-
-/* Drag handle — same height & centered */
-.wrap .grab {
-  height: var(--control-h) !important;
-  width:  var(--control-h) !important;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px dashed var(--line) !important;
-  border-radius: var(--control-r) !important;
-  box-sizing: border-box !important;
-  user-select: none; cursor: grab; color: var(--muted);
-  font-size: 18px;
-}
-
-/* Drag states */
-.wrap .row.dnd.dragging { opacity: .7; background: #f8fafc; border-radius: var(--control-r); }
-.wrap .row.dnd.over { outline: 2px dashed var(--pri); outline-offset: 2px; }
