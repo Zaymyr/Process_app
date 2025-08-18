@@ -39,10 +39,18 @@ export default function App() {
 
   // Step Handlers
   const addStep = () => {
-    if (lanes.length) {
-      setSteps((prev) => [...prev, { id: uid("step"), label: "", laneId: lanes[0].id }]);
+  setLanes(prevLanes => {
+    if (prevLanes.length) {
+      setSteps(prev => [...prev, { id: uid("step"), label: "", laneId: prevLanes[0].id }]);
+      return prevLanes;
+    } else {
+      const newLane = { id: uid("lane"), name: "General" };
+      setSteps(prev => [...prev, { id: uid("step"), label: "", laneId: newLane.id }]);
+      return [newLane];
     }
-  };
+  });
+};
+
 
   const updateStep = (i: number, patch: Partial<Step>) => {
     setSteps((ss) => ss.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
