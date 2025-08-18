@@ -124,7 +124,7 @@ export default function App() {
     steps.forEach((s) => stepsByLane.get(s.laneId)?.push(s));
 
     const lines: string[] = [];
-    lines.push("flowchart TD"); // you can switch to LR if you prefer
+    lines.push("flowchart LR"); // you can switch to LR if you prefer
 
     // Optional: title as comment
     lines.push(`%% ${esc(processName)} | Goal: ${esc(goal)} | Trigger: ${esc(trigger)}`);
