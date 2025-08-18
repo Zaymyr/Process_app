@@ -24,6 +24,7 @@ export function LaneList({
         <div className={!lanes.length && touched.lanes ? "field error" : "field"}>
           <label className="required">Lane name</label>
           <input
+            className="ctl"
             value={newLaneName}
             onChange={e => setNewLaneName(e.target.value)}
             onBlur={() => markTouched("lanes")}
