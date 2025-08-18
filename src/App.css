@@ -109,3 +109,49 @@ body {
     font-size: 2em;
   }
 }
+
+/* ---- Layout full width ---- */
+#root, .wrap { width: 100%; max-width: 100% !important; margin: 0; padding: 16px 24px; box-sizing: border-box; }
+.card { width: 100%; max-width: 100% !important; margin: 24px 0; }
+
+/* ---- Make form fields readable ---- */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 0.98em; font-weight: 600; color: #111; margin: 0; }
+.field .hint { display: block; margin-top: 2px; font-size: 0.92em; color: #6b7280; }  /* goes on a new line */
+.field input, .field select { width: 100%; font-size: 1rem; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; }
+.field input::placeholder, .field select::placeholder { color: #9ca3af; }
+
+/* ---- Section headers clearer ---- */
+.sec-hdr { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 12px; }
+.sec-hdr h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #111; }
+
+/* ---- Buttons: stronger contrast & affordance ---- */
+.btn { height: 40px; padding: 0 16px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; }
+.btn:not(:disabled) { cursor: pointer; }
+.btn.primary { background: #111; color: #fff; border: 1px solid #111; }
+.btn.primary:hover { filter: brightness(0.95); }
+.btn.ghost { background: #f5f6fa; color: #111; border: 1px solid #e5e7eb; }
+.btn.danger { background: #e11d48; color: #fff; border: 1px solid #e11d48; }
+
+/* Generate button spans full row but stays neat */
+.generate-section { text-align: center; }
+.generate-btn { width: 100%; max-width: 480px; }
+
+/* ---- “Add step” as a real button/link ---- */
+.add-step { display: inline-flex; align-items: center; gap: 8px; color: #2563eb; font-weight: 600; cursor: pointer; text-decoration: none; }
+.add-step:hover { text-decoration: underline; }
+.add-step:disabled, .add-step.disabled { color: #9ca3af; cursor: not-allowed; text-decoration: none; }
+
+/* ---- DnD row layout keeps alignment ---- */
+.wrap .row.dnd { display: grid; grid-template-columns: 40px 1fr 260px auto; gap: 12px; align-items: center; }
+.wrap input.ctl, .wrap select.ctl { height: 40px !important; line-height: 40px !important; padding: 0 12px !important; border-radius: 10px !important; }
+
+/* ---- Mermaid is horizontal & responsive (JS uses LR) ---- */
+.mermaid { width: 100%; overflow-x: auto; }
+.mermaid svg { width: 100% !important; height: auto !important; }
+
+/* ---- Mobile ---- */
+@media (max-width: 900px) {
+  .wrap .row.dnd { grid-template-columns: 40px 1fr; }
+}
+
