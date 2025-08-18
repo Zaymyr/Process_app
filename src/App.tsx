@@ -4,6 +4,7 @@ import { StepList } from "./components/StepList";
 import { MermaidDiagram } from "./components/MermaidDiagram";
 import { Lane, Step } from "./types";
 import { uid, esc } from "./utils";
+import './App.css';
 
 export default function App() {
   const [lanes, setLanes] = useState<Lane[]>([]);
