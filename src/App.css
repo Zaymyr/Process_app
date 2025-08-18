@@ -1,0 +1,58 @@
+/* ===== Hard overrides to align controls (placed LAST) ===== */
+:root { --control-h: 40px; --control-r: 10px; }
+
+.wrap .row.dnd {
+  display: grid;
+  grid-template-columns: 40px 1fr 220px auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Inputs/selects — exact same box sizing */
+.wrap input.ctl, .wrap select.ctl {
+  height: var(--control-h) !important;
+  line-height: var(--control-h) !important;
+  padding: 0 12px !important;              /* vertical padding = 0 */
+  border-radius: var(--control-r) !important;
+  box-sizing: border-box !important;
+  font-size: 14px !important;
+}
+
+/* Normalize select arrow (optional) */
+.wrap select.ctl {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+    linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+  background-position: right 12px center, right 6px center;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 28px !important;
+}
+
+/* Buttons — same height */
+.wrap .btn {
+  height: var(--control-h) !important;
+  line-height: var(--control-h) !important;
+  padding: 0 14px !important;
+  border-radius: var(--control-r) !important;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* Drag handle — same height & centered */
+.wrap .grab {
+  height: var(--control-h) !important;
+  width:  var(--control-h) !important;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--line) !important;
+  border-radius: var(--control-r) !important;
+  box-sizing: border-box !important;
+  user-select: none; cursor: grab; color: var(--muted);
+  font-size: 18px;
+}
+
+/* Drag states */
+.wrap .row.dnd.dragging { opacity: .7; background: #f8fafc; border-radius: var(--control-r); }
+.wrap .row.dnd.over { outline: 2px dashed var(--pri); outline-offset: 2px; }
