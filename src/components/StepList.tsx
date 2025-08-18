@@ -46,6 +46,7 @@ export function StepList({
             <div className={labelErr ? "field error" : "field"}>
               <label className="required">Label</label>
               <input
+                className="ctl"
                 value={s.label}
                 onChange={e => updateStep(i, { label: e.target.value })}
                 onBlur={() => markTouched(`step_label_${i}`)}
@@ -55,6 +56,7 @@ export function StepList({
             <div className={laneErr ? "field error" : "field"}>
               <label className="required">Lane</label>
               <select
+                className="ctl"
                 value={s.laneId}
                 onChange={e => updateStep(i, { laneId: e.target.value })}
                 onBlur={() => markTouched(`step_lane_${i}`)}
