@@ -131,7 +131,8 @@ body {
 .btn.primary { background: #111; color: #fff; border: 1px solid #111; }
 .btn.primary:hover { filter: brightness(0.95); }
 .btn.ghost { background: #f5f6fa; color: #111; border: 1px solid #e5e7eb; }
-.btn.danger { background: #e11d48; color: #fff; border: 1px solid #e11d48; }
+.btn.ghost.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.btn.ghost.danger:hover { background: #fee2e2; border-color: #fca5a5; }
 
 /* Generate button spans full row but stays neat */
 .generate-section { text-align: center; }
@@ -145,8 +146,8 @@ body {
 /* ---- DnD row layout keeps alignment ---- */
 .wrap .row.dnd { display: grid; grid-template-columns: 40px 1fr 260px 80px; gap: 12px; align-items: start; }
 .wrap input.ctl, .wrap select.ctl { height: 40px !important; line-height: 40px !important; padding: 0 12px !important; border-radius: 10px !important; }
-.wrap .row.dnd .grab { display: flex; align-items: center; justify-content: center; height: 40px; margin-top: 24px; }
-.wrap .row.dnd .btn { margin-top: 24px; }
+.wrap .row.dnd .grab { display: flex; align-items: center; justify-content: center; height: 40px; margin-top: 26px; }
+.wrap .row.dnd .btn { margin-top: 26px; }
 
 /* ---- Mermaid is horizontal & responsive (JS uses LR) ---- */
 .mermaid { width: 100%; overflow-x: auto; }

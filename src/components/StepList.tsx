@@ -67,7 +67,7 @@ export function StepList({
                 ))}
               </select>
             </div>
-            <button className="btn ghost danger" onClick={() => setSteps(ss => ss.filter(x => x.id !== s.id))}>Delete</button>
+            <button className="btn ghost danger" onClick={() => setSteps(ss => ss.filter(x => x.id !== s.id))}>Remove</button>
           </div>
         );
       })}
