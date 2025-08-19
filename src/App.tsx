@@ -12,7 +12,6 @@ export default function App() {
   const [processName, setProcessName] = useState("");
   const [goal, setGoal] = useState("");
   const [trigger, setTrigger] = useState("");
-
   const [lanes, setLanes] = useState<Lane[]>([]);
   const [newLaneName, setNewLaneName] = useState("");
   const [steps, setSteps] = useState<Step[]>([]);
