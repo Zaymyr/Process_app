@@ -4,28 +4,39 @@ import { questions, type Question, type Ctx } from "./questions";
 
 type WizardProps = { onDone: (model: ProcessModel) => void };
 
-const emptyModel: ProcessModel = {
-  name: "",
-  goal: "",
-  trigger: "",
-  lanes: [],
-  steps: [],
-  metrics: [],
-};
+const emptyModel: ProcessModel = { name:"", goal:"", trigger:"", lanes:[], steps:[], metrics:[] };
 
 export default function Wizard({ onDone }: WizardProps) {
   const [ctx, setCtx] = useState<Ctx>({ m: { ...emptyModel }, answers: {} });
   const [qId, setQId] = useState<string>("name");
   const [error, setError] = useState<string | undefined>();
-  const q = useMemo(() => questions.find((x) => x.id === qId)!, [qId]);
+  const [hist, setHist] = useState<string[]>(["name"]); // history stack
+
+  const q = useMemo(() => questions.find(x => x.id === qId) || null, [qId]);
+
+  // If a bad id ever slips in, show a helpful fallback instead of blank screen
+  if (!q) {
+    return (
+      <section className="card" style={{ minHeight: 200 }}>
+        <h3 style={{ marginTop: 0 }}>Wizard problem</h3>
+        <p className="error">Unknown step id: <code>{qId}</code></p>
+        <div className="row" style={{ gap: 8 }}>
+          <button className="btn ghost" onClick={() => setQId(hist[hist.length - 2] || "name")}>Go back</button>
+          <button className="btn" onClick={() => { setQId("name"); setHist(["name"]); }}>Restart</button>
+        </div>
+      </section>
+    );
+  }
+
+  const goTo = (nextId: string) => {
+    setHist(h => [...h, nextId]);
+    setQId(nextId);
+  };
 
   const handleNext = (value: any) => {
     // validate WITH context so lane checks work
     const err = q.validate?.(value, ctx);
-    if (err) {
-      setError(err);
-      return;
-    }
+    if (err) { setError(err); return; }
     setError(undefined);
 
     // apply answer -> next context
@@ -34,256 +45,48 @@ export default function Wizard({ onDone }: WizardProps) {
     setCtx(nextCtx);
 
     // compute next id
-    const dest =
-      typeof q.next === "function" ? (q.next as any)(value, nextCtx) : q.next;
+    const dest = typeof q.next === "function" ? (q.next as any)(value, nextCtx) : q.next;
+
+    // Defensive: ensure next exists
+    const exists = questions.some(x => x.id === dest) || (q.id === "review" && dest === "generate");
+    if (!exists) {
+      setError(`Wizard misconfigured: next step "${dest}" not found`);
+      return;
+    }
 
     if (q.id === "review" && dest === "generate") {
       onDone(nextCtx.m);
       return;
     }
-    setQId(dest);
+    goTo(dest);
+  };
+
+  const handleBack = () => {
+    setError(undefined);
+    setHist(h => {
+      if (h.length <= 1) return h;
+      const copy = h.slice(0, -1);
+      setQId(copy[copy.length - 1]);
+      return copy;
+    });
   };
 
   return (
     <section className="card" style={{ minHeight: 260 }}>
-      <h3 style={{ marginTop: 0 }}>Setup wizard</h3>
-      {q.help && (
-        <p className="hint" style={{ marginTop: -8 }}>
-          {q.help}
-        </p>
-      )}
-      <QuestionUI
-        q={q}
-        onNext={handleNext}
-        lanes={ctx.m.lanes.map((l) => l.name)}
-        error={error}
-      />
-      <p className="hint" style={{ marginTop: 12 }}>
-        Step {questions.findIndex((x) => x.id === qId) + 1} / {questions.length}
-      </p>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+        <h3 style={{ margin: 0 }}>Setup wizard</h3>
+        <span className="hint">Step {questions.findIndex(x => x.id === qId) + 1} / {questions.length}</span>
+      </div>
+
+      {q.help && <p className="hint" style={{ marginTop: -8 }}>{q.help}</p>}
+
+      <QuestionUI q={q} onNext={handleNext} lanes={ctx.m.lanes.map(l => l.name)} error={error} />
+
+      <div className="row" style={{ justifyContent: "space-between", marginTop: 12 }}>
+        <button className="btn ghost" type="button" onClick={handleBack} disabled={hist.length <= 1}>Back</button>
+        {/* optional debug chip */}
+        <span className="hint">Current: <code>{qId}</code></span>
+      </div>
     </section>
-  );
-}
-
-function QuestionUI({
-  q,
-  onNext,
-  lanes,
-  error,
-}: {
-  q: Question;
-  onNext: (v: any) => void;
-  lanes: string[];
-  error?: string;
-}) {
-  const defaultValueFor = (q: Question) =>
-    q.kind === "multi" || q.kind === "table" ? [] : "";
-
-  const [v, setV] = useState<any>(defaultValueFor(q));
-
-  // reset local value when question changes (prevents type mismatch)
-  useEffect(() => {
-    setV(defaultValueFor(q));
-  }, [q.id]);
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onNext(v);
-  };
-
-  return (
-    <form onSubmit={onSubmit} className="wizard">
-      {q.kind === "input" && (
-        <input
-          className="ctl"
-          placeholder={q.help}
-          value={typeof v === "string" ? v : ""}
-          onChange={(e) => setV(e.target.value)}
-        />
-      )}
-
-      {q.kind === "multi" && (
-        <TagInput
-          value={Array.isArray(v) ? v : []}
-          onChange={setV}
-          placeholder="Type and press Enter"
-        />
-      )}
-
-      {q.kind === "table" && (
-        <TableInput
-          value={Array.isArray(v) ? v : []}
-          onChange={setV}
-          lanes={lanes}
-        />
-      )}
-
-      {q.kind === "select" && (
-        <select
-          className="ctl"
-          value={typeof v === "string" ? v : ""}
-          onChange={(e) => setV(e.target.value)}
-        >
-          <option value="" disabled>
-            Select…
-          </option>
-          {("options" in q ? q.options : []).map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-      )}
-
-      {error && (
-        <div className="error" style={{ marginTop: 12 }}>
-          {error}
-        </div>
-      )}
-
-      <div style={{ marginTop: 12 }}>
-        <button className="btn primary" type="submit">
-          Next
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function TagInput({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string[];
-  onChange: (v: string[]) => void;
-  placeholder?: string;
-}) {
-  const items = Array.isArray(value) ? value : [];
-  const [input, setInput] = useState("");
-  const add = () => {
-    const t = input.trim();
-    if (!t) return;
-    onChange([...items, t]);
-    setInput("");
-  };
-  return (
-    <div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-        {items.map((t, i) => (
-          <span key={i} className="chip">
-            {t}
-            <button
-              onClick={() => onChange(items.filter((_, k) => k !== i))}
-              aria-label="remove"
-              type="button"
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="row">
-        <input
-          className="ctl"
-          placeholder={placeholder}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
-        />
-        <button type="button" className="btn ghost" onClick={add}>
-          Add
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function TableInput({
-  value,
-  onChange,
-  lanes,
-}: {
-  value: any[];
-  onChange: (v: any[]) => void;
-  lanes: string[];
-}) {
-  const rows = Array.isArray(value) ? value : [];
-  const safeLane = lanes[0] || "";
-
-  // If lanes change and a row has an invalid lane, fix it to the first lane
-  useEffect(() => {
-    if (!lanes.length) return;
-    const allowed = new Set(lanes);
-    const fixed = rows.map((r) => ({
-      ...r,
-      Lane: allowed.has(r?.Lane) ? r.Lane : safeLane,
-    }));
-    if (JSON.stringify(fixed) !== JSON.stringify(rows)) onChange(fixed);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lanes.join("|")]);
-
-  const add = () =>
-    onChange([...rows, { Action: "", Lane: safeLane }]);
-
-  const upd = (i: number, key: "Action" | "Lane", val: string) =>
-    onChange(rows.map((r, idx) => (idx === i ? { ...r, [key]: val } : r)));
-
-  const del = (i: number) =>
-    onChange(rows.filter((_, idx) => idx !== i));
-
-  return (
-    <div>
-      <div className="table">
-        <div className="thead">
-          <div>Action</div>
-          <div>Lane</div>
-          <div></div>
-        </div>
-        {rows.map((r, i) => (
-          <div key={i} className="trow">
-            <input
-              className="ctl"
-              placeholder="e.g., Validate request"
-              value={r?.Action || ""}
-              onChange={(e) => upd(i, "Action", e.target.value)}
-            />
-            <select
-              className="ctl"
-              value={r?.Lane ?? safeLane}
-              onChange={(e) => upd(i, "Lane", e.target.value)}
-              disabled={!lanes.length}
-            >
-              {lanes.length ? (
-                lanes.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))
-              ) : (
-                <option value="">No lanes</option>
-              )}
-            </select>
-            <button
-              type="button"
-              className="btn danger"
-              onClick={() => del(i)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
-      </div>
-      <button
-        type="button"
-        className="btn ghost"
-        onClick={add}
-        style={{ marginTop: 8 }}
-        disabled={!lanes.length}
-        title={lanes.length ? "Add action" : "Add some lanes first"}
-      >
-        + Add action
-      </button>
-    </div>
   );
 }
