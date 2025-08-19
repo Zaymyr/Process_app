@@ -170,6 +170,43 @@ body {
 .generate-section { text-align: center; }
 .generate-btn { width: 100%; max-width: 480px; }
 
+/* Orientation toggle styling */
+.orientation-toggle {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.orientation-toggle > label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+}
+
+.radio-option input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+
+.radio-option:hover {
+  color: #10b981;
+}
+
 /* ---- “Add step” as a real button/link ---- */
 .add-step { display: inline-flex; align-items: center; gap: 8px; color: #2563eb; font-weight: 600; cursor: pointer; text-decoration: none; }
 .add-step:hover { text-decoration: underline; }

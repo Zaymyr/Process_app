@@ -20,6 +20,7 @@ export default function App() {
   const [errors, setErrors] = useState<string[]>([]);
   const [mermaidSrc, setMermaidSrc] = useState("");
   const [isGenerated, setIsGenerated] = useState(false);
+  const [diagramOrientation, setDiagramOrientation] = useState<"TB" | "LR">("TB");
 
   // Lane Handlers
   const addLane = () => {
@@ -129,10 +130,13 @@ export default function App() {
     steps.forEach((s) => stepsByLane.get(s.laneId)?.push(s));
 
     const lines: string[] = [];
-    lines.push("flowchart LR"); // you can switch to LR if you prefer
+    lines.push(`flowchart ${diagramOrientation}`);
 
-    // Optional: title as comment
-    lines.push(`%% ${esc(processName)} | Goal: ${esc(goal)} | Trigger: ${esc(trigger)}`);
+    // Add metadata as visible nodes
+    lines.push(`START([${esc(trigger)}])`);
+    lines.push(`GOAL([${esc(goal)}])`);
+    lines.push(`TITLE["<b>${esc(processName)}</b>"]`);
+    lines.push("");
 
     // 1) Subgraphs / lanes
     for (const lane of lanes) {
@@ -146,11 +150,31 @@ export default function App() {
 
     // 2) Connect steps in current list order (global flow)
     // If you prefer per-lane flow only, change to link within each laneSteps instead.
+    // Connect trigger to first step
+    if (steps.length > 0) {
+      lines.push(`START --> ${steps[0].id}`);
+    }
+    
     for (let i = 1; i < steps.length; i++) {
       const prev = steps[i - 1];
       const curr = steps[i];
       lines.push(`${prev.id} --> ${curr.id}`);
     }
+    
+    // Connect last step to goal
+    if (steps.length > 0) {
+      lines.push(`${steps[steps.length - 1].id} --> GOAL`);
+    }
+    
+    // Add title at the top
+    lines.push(`TITLE -.-> START`);
+    lines.push("");
+    
+    // Style the metadata nodes
+    lines.push(`classDef startEnd fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000`);
+    lines.push(`classDef title fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000`);
+    lines.push(`class START,GOAL startEnd`);
+    lines.push(`class TITLE title`);
 
     setMermaidSrc(lines.join("\n"));
     setIsGenerated(true);
@@ -201,6 +225,31 @@ export default function App() {
       />
 
       <section className="card generate-section">
+        <div className="orientation-toggle">
+          <label>Diagram Orientation:</label>
+          <div className="radio-group">
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="orientation"
+                value="TB"
+                checked={diagramOrientation === "TB"}
+                onChange={(e) => setDiagramOrientation(e.target.value as "TB" | "LR")}
+              />
+              <span>Vertical (Top to Bottom)</span>
+            </label>
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="orientation"
+                value="LR"
+                checked={diagramOrientation === "LR"}
+                onChange={(e) => setDiagramOrientation(e.target.value as "TB" | "LR")}
+              />
+              <span>Horizontal (Left to Right)</span>
+            </label>
+          </div>
+        </div>
         <button
           className="btn generate-btn"
           onClick={generateDiagram}
