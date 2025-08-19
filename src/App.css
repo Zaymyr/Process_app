@@ -227,3 +227,9 @@ body {
   .wrap .row.dnd { grid-template-columns: 40px 1fr; }
 }
 
+.wizard .ctl { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; }
+.chip { background:#eef2ff; border:1px solid #c7d2fe; color:#1f2937; padding:4px 8px; border-radius:999px; display:inline-flex; gap:6px; align-items:center; }
+.chip button { background:transparent; border:0; cursor:pointer; }
+.table { display:grid; gap:8px; }
+.thead, .trow { display:grid; grid-template-columns: 1fr 260px 100px; gap:8px; align-items:center; }
+
