@@ -143,8 +143,10 @@ body {
 .add-step:disabled, .add-step.disabled { color: #9ca3af; cursor: not-allowed; text-decoration: none; }
 
 /* ---- DnD row layout keeps alignment ---- */
-.wrap .row.dnd { display: grid; grid-template-columns: 40px 1fr 260px auto; gap: 12px; align-items: center; }
+.wrap .row.dnd { display: grid; grid-template-columns: 40px 1fr 260px 80px; gap: 12px; align-items: start; }
 .wrap input.ctl, .wrap select.ctl { height: 40px !important; line-height: 40px !important; padding: 0 12px !important; border-radius: 10px !important; }
+.wrap .row.dnd .grab { display: flex; align-items: center; justify-content: center; height: 40px; margin-top: 24px; }
+.wrap .row.dnd .btn { margin-top: 24px; }
 
 /* ---- Mermaid is horizontal & responsive (JS uses LR) ---- */
 .mermaid { width: 100%; overflow-x: auto; }
