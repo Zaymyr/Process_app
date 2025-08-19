@@ -31,14 +31,14 @@ export function LaneList({
             placeholder="e.g., Sales"
           />
         </div>
-        <button className="btn" onClick={addLane}>Add lane</button>
+        <button className="btn primary" onClick={addLane}>Add Lane</button>
       </div>
       {lanes.length > 0 && (
         <ul className="lanes">
           {lanes.map(l => (
             <li key={l.id}>
               <span className="pill">{l.name}</span>
-              <button className="btn ghost" onClick={() => removeLane(l.id)}>Remove</button>
+              <button className="btn ghost danger" onClick={() => removeLane(l.id)}>Remove</button>
             </li>
           ))}
         </ul>

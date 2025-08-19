@@ -71,8 +71,8 @@ export function StepList({
           </div>
         );
       })}
-      <button className="btn" onClick={addStep} disabled={!lanes.length} title={!lanes.length ? "Add a lane first" : ""}>
-        + Add step
+      <button className="btn primary" onClick={addStep} disabled={!lanes.length} title={!lanes.length ? "Add a lane first" : ""}>
+        Add Step
       </button>
     </section>
   );
