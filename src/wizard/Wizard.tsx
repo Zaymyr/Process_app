@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import type { ProcessModel } from "../types";
 import { questions, type Question, type Ctx } from "./questions";
 
