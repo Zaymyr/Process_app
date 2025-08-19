@@ -49,89 +49,184 @@ export default function Wizard({ onDone }: WizardProps) {
 }
 
 /* ---- minimal renderer ---- */
-function QuestionUI({ q, onNext, lanes, error }: { q: Question; onNext:(v:any)=>void; lanes:string[]; error?:string; }) {
-  const [v, setV] = useState<any>(q.kind==="multi" ? [] : q.kind==="table" ? [] : "");
+function QuestionUI({
+  q,
+  onNext,
+  lanes,
+  error,
+}: {
+  q: Question;
+  onNext: (v: any) => void;
+  lanes: string[];
+  error?: string;
+}) {
+  // default value per kind
+  const defaultValueFor = (q: Question) =>
+    q.kind === "multi" || q.kind === "table" ? [] : "";
 
-  const onSubmit = (e: React.FormEvent) => { e.preventDefault(); onNext(v); };
+  const [v, setV] = useState<any>(defaultValueFor(q));
+
+  // 🔧 Reset value when the question changes (prevents type mismatch)
+  useEffect(() => {
+    setV(defaultValueFor(q));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q.id]);
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onNext(v);
+  };
 
   return (
     <form onSubmit={onSubmit} className="wizard">
       {q.kind === "input" && (
-        <input className="ctl" placeholder={q.help} value={v} onChange={e=>setV(e.target.value)} />
+        <input
+          className="ctl"
+          placeholder={q.help}
+          value={typeof v === "string" ? v : ""}
+          onChange={(e) => setV(e.target.value)}
+        />
       )}
 
       {q.kind === "multi" && (
-        <TagInput value={v} onChange={setV} placeholder="Type and press Enter" />
+        <TagInput
+          value={Array.isArray(v) ? v : []}           {/* robust cast */}
+          onChange={setV}
+          placeholder="Type and press Enter"
+        />
       )}
 
       {q.kind === "table" && (
-        <TableInput value={v} onChange={setV} lanes={lanes} />
+        <TableInput
+          value={Array.isArray(v) ? v : []}           {/* robust cast */}
+          onChange={setV}
+          lanes={lanes}
+        />
       )}
 
       {q.kind === "select" && (
-        <select className="ctl" value={v} onChange={e=>setV(e.target.value)}>
-          <option value="" disabled>Select…</option>
-          {(q.options || []).map(o => <option key={o} value={o}>{o}</option>)}
+        <select
+          className="ctl"
+          value={typeof v === "string" ? v : ""}
+          onChange={(e) => setV(e.target.value)}
+        >
+          <option value="" disabled>
+            Select…
+          </option>
+          {(q.options || []).map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
         </select>
       )}
 
       {error && <div className="error" style={{ marginTop: 12 }}>{error}</div>}
 
       <div style={{ marginTop: 12 }}>
-        <button className="btn primary" type="submit">Next</button>
+        <button className="btn primary" type="submit">
+          Next
+        </button>
       </div>
     </form>
   );
 }
 
+
 /* ---- Simple chips input for multi ---- */
-function TagInput({ value, onChange, placeholder }:{ value:string[]; onChange:(v:string[])=>void; placeholder?:string; }) {
+function TagInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  placeholder?: string;
+}) {
+  const items = Array.isArray(value) ? value : [];     // safety
   const [input, setInput] = useState("");
   const add = () => {
     const t = input.trim();
     if (!t) return;
-    onChange([...(value||[]), t]);
+    onChange([...items, t]);
     setInput("");
   };
   return (
     <div>
-      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:8 }}>
-        {(value||[]).map((t,i)=>(
-          <span key={i} className="chip">{t}<button onClick={()=>onChange(value.filter((_,k)=>k!==i))} aria-label="remove">×</button></span>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        {items.map((t, i) => (
+          <span key={i} className="chip">
+            {t}
+            <button onClick={() => onChange(items.filter((_, k) => k !== i))} aria-label="remove">
+              ×
+            </button>
+          </span>
         ))}
       </div>
       <div className="row">
-        <input className="ctl" placeholder={placeholder} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(e.preventDefault(),add())}/>
-        <button type="button" className="btn ghost" onClick={add}>Add</button>
+        <input
+          className="ctl"
+          placeholder={placeholder}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
+        />
+        <button type="button" className="btn ghost" onClick={add}>
+          Add
+        </button>
       </div>
     </div>
   );
 }
 
-/* ---- Minimal table input for steps (Action + Lane) ---- */
-function TableInput({ value, onChange, lanes }:{ value:any[]; onChange:(v:any[])=>void; lanes:string[] }) {
-  const rows = value || [];
-  const add = () => onChange([...rows, { "Action":"", "Lane": lanes[0] || "" }]);
-  const upd = (i:number, key:"Action"|"Lane", val:string) => onChange(rows.map((r,idx)=>idx===i?{...r,[key]:val}:r));
-  const del = (i:number) => onChange(rows.filter((_,idx)=>idx!==i));
+function TableInput({
+  value,
+  onChange,
+  lanes,
+}: {
+  value: any[];
+  onChange: (v: any[]) => void;
+  lanes: string[];
+}) {
+  const rows = Array.isArray(value) ? value : [];      // safety
+  const safeLane = lanes[0] || "";
+  const add = () => onChange([...rows, { Action: "", Lane: safeLane }]);
+  const upd = (i: number, key: "Action" | "Lane", val: string) =>
+    onChange(rows.map((r, idx) => (idx === i ? { ...r, [key]: val } : r)));
+  const del = (i: number) => onChange(rows.filter((_, idx) => idx !== i));
 
   return (
     <div>
       <div className="table">
         <div className="thead">
-          <div>Action</div><div>Lane</div><div></div>
+          <div>Action</div>
+          <div>Lane</div>
+          <div></div>
         </div>
-        {rows.map((r,i)=>(
+        {rows.map((r, i) => (
           <div key={i} className="trow">
-            <input className="ctl" placeholder="e.g., Validate request" value={r.Action} onChange={e=>upd(i,"Action",e.target.value)} />
-            <select className="ctl" value={r.Lane} onChange={e=>upd(i,"Lane",e.target.value)}>
-              {lanes.map(n=><option key={n} value={n}>{n}</option>)}
+            <input
+              className="ctl"
+              placeholder="e.g., Validate request"
+              value={r.Action || ""}
+              onChange={(e) => upd(i, "Action", e.target.value)}
+            />
+            <select
+              className="ctl"
+              value={r.Lane || safeLane}
+              onChange={(e) => upd(i, "Lane", e.target.value)}
+            >
+              {lanes.length ? lanes.map((n) => <option key={n} value={n}>{n}</option>) : <option value="">No lanes yet</option>}
             </select>
-            <button type="button" className="btn danger" onClick={()=>del(i)}>Delete</button>
+            <button type="button" className="btn danger" onClick={() => del(i)}>
+              Delete
+            </button>
           </div>
         ))}
       </div>
-      <button type="button" className="btn ghost" onClick={add} style={{ marginTop: 8 }}>+ Add action</button>
+      <button type="button" className="btn ghost" onClick={add} style={{ marginTop: 8 }}>
+        + Add action
+      </button>
     </div>
   );
 }
