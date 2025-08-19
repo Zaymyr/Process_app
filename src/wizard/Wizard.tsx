@@ -106,7 +106,6 @@ function QuestionUI({
           lanes={lanes}
         />
       )}
-}
 
       {q.kind === "select" && (
         <select
