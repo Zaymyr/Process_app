@@ -43,14 +43,34 @@ export const questions: Question[] = [
     prompt: "Happy path — actions to reach the goal (verb‑first)",
     help: "Add 5–9 actions. Map each action to a lane.",
     columns: ["Action", "Lane"],
-    validate: (rows:any[]) => rows?.length ? undefined : "Add at least one step",
-    onAnswer: (rows:any[], ctx) => {
-      const byName = new Map(ctx.m.lanes.map(l => [l.name, l.id]));
-      ctx.m.steps = (rows || []).map(r => ({
-        id: uid("step"),
-        label: String(r["Action"] || "").trim(),
-        laneId: byName.get(String(r["Lane"])) || ctx.m.lanes[0].id
-      } as Step));
+    validate: (rows: any[], ctx?: any) => {
+  if (!rows?.length) return "Add at least one step";
+  const laneNames = new Set((ctx?.m?.lanes || []).map((l: any) => l.name));
+  for (const r of rows) {
+    if (!String(r?.Action || "").trim()) return "Each step needs an Action label";
+    if (!laneNames.has(String(r?.Lane || ""))) return "Each step must be mapped to an existing lane";
+  }
+  return undefined;
+},
+onAnswer: (rows: any[], ctx) => {
+  // No lanes? Create a default one to avoid crashes.
+  if (!ctx.m.lanes?.length) {
+    ctx.m.lanes = [{ id: uid("lane"), name: "General" }];
+  }
+  const byName = new Map(ctx.m.lanes.map((l: any) => [l.name, l.id]));
+  const fallbackLaneId = ctx.m.lanes[0].id;
+
+  ctx.m.steps = (rows || []).map((r: any) => {
+    const name = String(r?.Lane || "");
+    const laneId = byName.get(name) || fallbackLaneId; // robust fallback
+    return {
+      id: uid("step"),
+      label: String(r?.Action || "").trim(),
+      laneId,
+    };
+  });
+},
+
     },
     next: "metrics"
   },
