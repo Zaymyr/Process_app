@@ -25,6 +25,17 @@ export default function App() {
   const [isGenerated, setIsGenerated] = useState(false);
   const [diagramOrientation, setDiagramOrientation] = useState<"TB" | "LR">("TB");
 
+  const handleWizardDone = (m: ProcessModel) => {
+  setProcessName(m.name);
+  setGoal(m.goal);
+  setTrigger(m.trigger);
+  setLanes(m.lanes);
+  setSteps(m.steps);
+  setErrors([]);
+  setIsGenerated(false);
+  setView("editor");
+};
+
   // Lane Handlers
   const addLane = () => {
     if (newLaneName.trim()) {
