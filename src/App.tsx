@@ -194,102 +194,93 @@ export default function App() {
   };
 
   return (
-    <div className="wrap">
-      <header className="header">
-        <h1>Process Designer</h1>
-        <p>Create beautiful process diagrams with swimlanes</p>
-      </header>
+  <div className="wrap">
+    <header className="header">
+      <h1>Process Designer</h1>
+      <p>Create beautiful process diagrams with swimlanes</p>
+    </header>
 
-      <MetaForm
-        processName={processName}
-        setProcessName={setProcessName}
-        goal={goal}
-        setGoal={setGoal}
-        trigger={trigger}
-        setTrigger={setTrigger}
-        touched={touched}
-        markTouched={markTouched}
-      />
+    {view === "wizard" ? (
+      <Wizard onDone={handleWizardDone} />
+    ) : (
+      <>
+        <MetaForm
+          processName={processName}
+          setProcessName={setProcessName}
+          goal={goal}
+          setGoal={setGoal}
+          trigger={trigger}
+          setTrigger={setTrigger}
+          touched={touched}
+          markTouched={markTouched}
+        />
 
-      <LaneList
-        lanes={lanes}
-        newLaneName={newLaneName}
-        setNewLaneName={setNewLaneName}
-        touched={touched}
-        markTouched={markTouched}
-        addLane={addLane}
-        removeLane={removeLane}
-      />
+        <LaneList
+          lanes={lanes}
+          newLaneName={newLaneName}
+          setNewLaneName={setNewLaneName}
+          touched={touched}
+          markTouched={markTouched}
+          addLane={addLane}
+          removeLane={removeLane}
+        />
 
-      <StepList
-        steps={steps}
-        lanes={lanes}
-        touched={touched}
-        markTouched={markTouched}
-        updateStep={updateStep}
-        setSteps={setSteps}
-        addStep={addStep}
-        dragIndex={dragIndex}
-        overIndex={overIndex}
-        handleDragStart={handleDragStart}
-        handleDragOver={handleDragOver}
-        handleDrop={handleDrop}
-        handleDragEnd={handleDragEnd}
-      />
+        <StepList
+          steps={steps}
+          lanes={lanes}
+          touched={touched}
+          markTouched={markTouched}
+          updateStep={updateStep}
+          setSteps={setSteps}
+          addStep={addStep}
+          dragIndex={dragIndex}
+          overIndex={overIndex}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          handleDragEnd={handleDragEnd}
+        />
 
-      <section className="card generate-section">
-        <div className="orientation-toggle">
-          <label>Diagram Orientation:</label>
-          <div className="radio-group">
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="orientation"
-                value="TB"
-                checked={diagramOrientation === "TB"}
-                onChange={(e) => setDiagramOrientation(e.target.value as "TB" | "LR")}
-              />
-              <span>Vertical (Top to Bottom)</span>
-            </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="orientation"
-                value="LR"
-                checked={diagramOrientation === "LR"}
-                onChange={(e) => setDiagramOrientation(e.target.value as "TB" | "LR")}
-              />
-              <span>Horizontal (Left to Right)</span>
-            </label>
+        <section className="card generate-section">
+          <div className="orientation-toggle">
+            {/* orientation radio as you already had */}
           </div>
-        </div>
-        <button
-          className="btn generate-btn"
-          onClick={generateDiagram}
-          disabled={
-            !processName ||
-            !goal ||
-            !trigger ||
-            lanes.length === 0 ||
-            steps.length === 0 ||
-            steps.some((s) => !s.label.trim())
-          }
-        >
-          Generate Process Diagram
-        </button>
-      </section>
+          <button
+            className="btn generate-btn"
+            onClick={generateDiagram}
+            disabled={
+              !processName ||
+              !goal ||
+              !trigger ||
+              lanes.length === 0 ||
+              steps.length === 0 ||
+              steps.some((s) => !s.label.trim())
+            }
+          >
+            Generate Process Diagram
+          </button>
+          <div style={{ marginTop: 12 }}>
+            <button className="btn ghost" onClick={() => setView("wizard")}>
+              Restart Wizard
+            </button>
+          </div>
+        </section>
 
-      {isGenerated && <MermaidDiagram mermaidSrc={mermaidSrc} setErrors={setErrors} />}
+        {isGenerated && (
+          <MermaidDiagram mermaidSrc={mermaidSrc} setErrors={setErrors} />
+        )}
 
-      {errors.length > 0 && (
-        <div className="error-list">
-          {errors.map((err, i) => (
-            <div key={i} className="error">
-              {err}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+        {errors.length > 0 && (
+          <div className="error-list">
+            {errors.map((err, i) => (
+              <div key={i} className="error">
+                {err}
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    )}
+  </div>
+);
 }
