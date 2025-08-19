@@ -90,19 +90,23 @@ function QuestionUI({
 
       {q.kind === "multi" && (
         <TagInput
-          value={Array.isArray(v) ? v : []}           {/* robust cast */}
+          // robust cast: always pass an array
+          value={Array.isArray(v) ? v : []}
           onChange={setV}
           placeholder="Type and press Enter"
         />
       )}
 
+
       {q.kind === "table" && (
         <TableInput
-          value={Array.isArray(v) ? v : []}           {/* robust cast */}
+          // robust cast: always pass an array
+          value={Array.isArray(v) ? v : []}
           onChange={setV}
           lanes={lanes}
         />
       )}
+}
 
       {q.kind === "select" && (
         <select
