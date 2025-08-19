@@ -121,6 +121,16 @@ body {
 .field input, .field select { width: 100%; font-size: 1rem; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; }
 .field input::placeholder, .field select::placeholder { color: #9ca3af; }
 
+/* ---- Lane add section spacing ---- */
+.lane-add { display: flex; align-items: end; gap: 16px; margin-bottom: 20px; }
+.lane-add .field { flex: 1; }
+
+/* ---- Lane list spacing ---- */
+.lanes { list-style: none; padding: 0; margin: 0; }
+.lanes li { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.lanes li:last-child { border-bottom: none; }
+.pill { background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 20px; font-size: 0.9em; font-weight: 500; }
+
 /* ---- Section headers clearer ---- */
 .sec-hdr { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 12px; }
 .sec-hdr h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #111; }
