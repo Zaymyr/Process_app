@@ -2,11 +2,19 @@ import { uid } from "../utils";
 import type { ProcessModel, Lane, Step } from "../types";
 
 export type Ctx = { m: ProcessModel; answers: Record<string, any> };
-export type Question =
-  | { id: string; kind: "input";  prompt: string; help?: string; validate?: (v:any)=>string|undefined; onAnswer?: (v:any,ctx:Ctx)=>void; next: string }
-  | { id: string; kind: "multi";  prompt: string; help?: string; validate?: (v:any)=>string|undefined; onAnswer?: (v:any,ctx:Ctx)=>void; next: string }
-  | { id: string; kind: "table";  prompt: string; help?: string; columns: string[]; validate?: (v:any)=>string|undefined; onAnswer?: (v:any,ctx:Ctx)=>void; next: string }
-  | { id: string; kind: "select"; prompt: string; help?: string; options: string[]; next: (v:any)=>string };
+// type
+export type Question = {
+  id: string;
+  kind: "input" | "multi" | "table" | "select";
+  prompt: string;
+  help?: string;
+  options?: string[];
+  columns?: string[];
+  validate?: (value: any, ctx: Ctx) => string | undefined; // <-- ctx added
+  onAnswer?: (value: any, ctx: Ctx) => void;
+  next: string | ((value: any, ctx: Ctx) => string);
+};
+
 
 export const questions: Question[] = [
   { id: "name", kind: "input",
@@ -43,14 +51,16 @@ export const questions: Question[] = [
     prompt: "Happy path — actions to reach the goal (verb‑first)",
     help: "Add 5–9 actions. Map each action to a lane.",
     columns: ["Action", "Lane"],
-    validate: (rows: any[], ctx?: any) => {
-      if (!rows?.length) return "Add at least one step";
-      const laneNames = new Set((ctx?.m?.lanes || []).map((l: any) => l.name));
-      for (const r of rows) {
-        if (!String(r?.Action || "").trim()) return "Each step needs an Action label";
-        if (!laneNames.has(String(r?.Lane || ""))) return "Each step must be mapped to an existing lane";
-      }
-      return undefined;
+    validate: (rows: any[], ctx: Ctx) => {
+  if (!rows?.length) return "Add at least one step";
+  const laneNames = new Set((ctx.m.lanes || []).map(l => l.name));
+  for (const r of rows) {
+    if (!String(r?.Action || "").trim()) return "Each step needs an Action label";
+    if (!laneNames.has(String(r?.Lane || ""))) return "Each step must be mapped to an existing lane";
+  }
+  return undefined;
+},
+
 },
     onAnswer: (rows: any[], ctx) => {
         // No lanes? Create a default one to avoid crashes.
