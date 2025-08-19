@@ -135,7 +135,6 @@ export default function App() {
     // Add metadata as visible nodes
     lines.push(`START([${esc(trigger)}])`);
     lines.push(`GOAL([${esc(goal)}])`);
-    lines.push(`TITLE["<b>${esc(processName)}</b>"]`);
     lines.push("");
 
     // 1) Subgraphs / lanes
@@ -166,8 +165,8 @@ export default function App() {
       lines.push(`${steps[steps.length - 1].id} --> GOAL`);
     }
     
-    // Add title at the top
-    lines.push(`TITLE -.-> START`);
+    // Add process name as title (not connected to flow)
+    lines.push(`TITLE["<b>${esc(processName)}</b>"]`);
     lines.push("");
     
     // Style the metadata nodes
