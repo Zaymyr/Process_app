@@ -131,6 +131,11 @@ body {
 .lanes li:last-child { border-bottom: none; }
 .pill { background: #f3f4f6; color: #374151; padding: 6px 12px; border-radius: 20px; font-size: 0.9em; font-weight: 500; }
 
+/* ---- Add step button spacing ---- */
+.card .btn.primary:last-child {
+  margin-top: 20px;
+}
+
 /* ---- Section headers clearer ---- */
 .sec-hdr { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 12px; }
 .sec-hdr h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #111; }
@@ -138,9 +143,25 @@ body {
 /* ---- Buttons: stronger contrast & affordance ---- */
 .btn { height: 40px; padding: 0 16px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; }
 .btn:not(:disabled) { cursor: pointer; }
-.btn.primary { background: #111; color: #fff; border: 1px solid #111; }
-.btn.primary:hover { filter: brightness(0.95); }
-.btn.primary:disabled { background: #d1d7e0; color: #888; cursor: not-allowed; }
+.btn.primary { 
+  background: #10b981; 
+  color: #fff; 
+  border: 1px solid #10b981; 
+  transition: all 0.2s ease;
+}
+.btn.primary:hover:not(:disabled) { 
+  background: #059669; 
+  border-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.btn.primary:disabled { 
+  background: #d1d7e0; 
+  color: #888; 
+  cursor: not-allowed; 
+  transform: none;
+  box-shadow: none;
+}
 .btn.ghost { background: #f5f6fa; color: #111; border: 1px solid #e5e7eb; }
 .btn.ghost.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 .btn.ghost.danger:hover { background: #fee2e2; border-color: #fca5a5; }
