@@ -6,9 +6,13 @@ import { StepList } from "./components/StepList";
 import { MermaidDiagram } from "./components/MermaidDiagram";
 import { Lane, Step } from "./types";
 import { uid, esc } from "./utils";
+import Wizard from "./wizard/Wizard";
+import type { ProcessModel } from "./types";
+
 
 export default function App() {
   // Meta information
+  const [view, setView] = useState<"wizard" | "editor">("wizard");
   const [processName, setProcessName] = useState("");
   const [goal, setGoal] = useState("");
   const [trigger, setTrigger] = useState("");
