@@ -1,96 +1,148 @@
 import { uid } from "../utils";
-import type { ProcessModel, Lane, Step } from "../types";
+import type { Lane, Step, ProcessModel } from "../types";
 
 export type Ctx = { m: ProcessModel; answers: Record<string, any> };
-// type
-export type Question = {
-  id: string;
-  kind: "input" | "multi" | "table" | "select";
-  prompt: string;
-  help?: string;
-  options?: string[];
-  columns?: string[];
-  validate?: (value: any, ctx: Ctx) => string | undefined; // <-- ctx added
-  onAnswer?: (value: any, ctx: Ctx) => void;
-  next: string | ((value: any, ctx: Ctx) => string);
-};
 
+export type Question =
+  | {
+      id: string;
+      kind: "input";
+      prompt: string;
+      help?: string;
+      validate?: (value: any, ctx: Ctx) => string | undefined;
+      onAnswer?: (value: any, ctx: Ctx) => void;
+      next: string | ((value: any, ctx: Ctx) => string);
+    }
+  | {
+      id: string;
+      kind: "multi";
+      prompt: string;
+      help?: string;
+      validate?: (value: any, ctx: Ctx) => string | undefined;
+      onAnswer?: (value: any, ctx: Ctx) => void;
+      next: string | ((value: any, ctx: Ctx) => string);
+    }
+  | {
+      id: string;
+      kind: "table";
+      prompt: string;
+      help?: string;
+      columns: string[];
+      validate?: (value: any, ctx: Ctx) => string | undefined;
+      onAnswer?: (value: any, ctx: Ctx) => void;
+      next: string | ((value: any, ctx: Ctx) => string);
+    }
+  | {
+      id: string;
+      kind: "select";
+      prompt: string;
+      help?: string;
+      options: string[];
+      validate?: (value: any, ctx: Ctx) => string | undefined;
+      onAnswer?: (value: any, ctx: Ctx) => void;
+      next: string | ((value: any, ctx: Ctx) => string);
+    };
 
 export const questions: Question[] = [
-  { id: "name", kind: "input",
+  {
+    id: "name",
+    kind: "input",
     prompt: "Process name",
     help: "e.g., Customer Onboarding",
-    validate: v => v?.trim() ? undefined : "Required",
-    onAnswer: (v, ctx) => ctx.m.name = v.trim(),
-    next: "goal"
+    validate: (v) => (String(v || "").trim() ? undefined : "Required"),
+    onAnswer: (v, ctx) => {
+      ctx.m.name = String(v || "").trim();
+    },
+    next: "goal",
   },
-  { id: "goal", kind: "input",
+  {
+    id: "goal",
+    kind: "input",
     prompt: "What outcome should be guaranteed?",
     help: "e.g., Account activated",
-    validate: v => v?.trim() ? undefined : "Required",
-    onAnswer: (v, ctx) => ctx.m.goal = v.trim(),
-    next: "trigger"
+    validate: (v) => (String(v || "").trim() ? undefined : "Required"),
+    onAnswer: (v, ctx) => {
+      ctx.m.goal = String(v || "").trim();
+    },
+    next: "trigger",
   },
-  { id: "trigger", kind: "input",
+  {
+    id: "trigger",
+    kind: "input",
     prompt: "What starts the process?",
     help: "e.g., Signed contract received",
-    validate: v => v?.trim() ? undefined : "Required",
-    onAnswer: (v, ctx) => ctx.m.trigger = v.trim(),
-    next: "lanes"
+    validate: (v) => (String(v || "").trim() ? undefined : "Required"),
+    onAnswer: (v, ctx) => {
+      ctx.m.trigger = String(v || "").trim();
+    },
+    next: "lanes",
   },
-  { id: "lanes", kind: "multi",
+  {
+    id: "lanes",
+    kind: "multi",
     prompt: "Who is involved? (teams/roles → lanes)",
     help: "Add 1–6 lanes",
-    validate: (arr:string[]) => (arr?.length ? undefined : "Add at least one lane"),
-    onAnswer: (arr:string[], ctx) => {
-      ctx.m.lanes = (arr || []).map(n => ({ id: uid("lane"), name: String(n).trim() } as Lane));
+    validate: (arr) =>
+      Array.isArray(arr) && arr.length > 0 ? undefined : "Add at least one lane",
+    onAnswer: (arr, ctx) => {
+      const names = (Array.isArray(arr) ? arr : []).map((x) => String(x || "").trim()).filter(Boolean);
+      ctx.m.lanes = names.map((n) => ({ id: uid("lane"), name: n } as Lane));
     },
-    next: "happy"
+    next: "happy",
   },
-  { id: "happy", kind: "table",
+  {
+    id: "happy",
+    kind: "table",
     prompt: "Happy path — actions to reach the goal (verb‑first)",
-    help: "Add 5–9 actions. Map each action to a lane.",
+    help: "Add actions and map each to a lane.",
     columns: ["Action", "Lane"],
-    validate: (rows: any[], ctx: Ctx) => {
-  if (!rows?.length) return "Add at least one step";
-  const laneNames = new Set((ctx.m.lanes || []).map(l => l.name));
-  for (const r of rows) {
-    if (!String(r?.Action || "").trim()) return "Each step needs an Action label";
-    if (!laneNames.has(String(r?.Lane || ""))) return "Each step must be mapped to an existing lane";
-  }
-  return undefined;
-
-
-},
-    onAnswer: (rows: any[], ctx) => {
-        // No lanes? Create a default one to avoid crashes.
-        if (!ctx.m.lanes?.length) {
-          ctx.m.lanes = [{ id: uid("lane"), name: "General" }];
-        }
-        const byName = new Map(ctx.m.lanes.map((l: any) => [l.name, l.id]));
-        const fallbackLaneId = ctx.m.lanes[0].id;
-      
-        ctx.m.steps = (rows || []).map((r: any) => {
-          const name = String(r?.Lane || "");
-          const laneId = byName.get(name) || fallbackLaneId; // robust fallback
-          return {
-            id: uid("step"),
-            label: String(r?.Action || "").trim(),
-            laneId,
-          };
-        });
+    validate: (rows, ctx) => {
+      const list = Array.isArray(rows) ? rows : [];
+      if (list.length === 0) return "Add at least one step";
+      const laneNames = new Set((ctx.m.lanes || []).map((l) => l.name));
+      for (const r of list) {
+        const action = String(r?.Action || "").trim();
+        const lane = String(r?.Lane || "");
+        if (!action) return "Each step needs an Action label";
+        if (!laneNames.has(lane)) return "Each step must be mapped to an existing lane";
+      }
+      return undefined;
     },
-    next: "metrics"
+    onAnswer: (rows, ctx) => {
+      if (!ctx.m.lanes?.length) {
+        ctx.m.lanes = [{ id: uid("lane"), name: "General" }];
+      }
+      const byName = new Map(ctx.m.lanes.map((l) => [l.name, l.id]));
+      const fallbackLaneId = ctx.m.lanes[0].id;
+      const list = Array.isArray(rows) ? rows : [];
+      ctx.m.steps = list.map((r) => {
+        const laneName = String(r?.Lane || "");
+        const laneId = byName.get(laneName) || fallbackLaneId;
+        return {
+          id: uid("step"),
+          label: String(r?.Action || "").trim(),
+          laneId,
+        } as Step;
+      });
+    },
+    next: "metrics",
   },
-  { id: "metrics", kind: "multi",
+  {
+    id: "metrics",
+    kind: "multi",
     prompt: "What will you measure? (optional)",
-    help: "e.g., Lead time, First-pass yield",
-    onAnswer: (arr, ctx) => (ctx.m.metrics = arr || []),
-    next: "review"
+    help: "e.g., Lead time, First‑pass yield",
+    onAnswer: (arr, ctx) => {
+      ctx.m.metrics = Array.isArray(arr) ? arr : [];
+    },
+    next: "review",
   },
-  { id: "review", kind: "select",
+  {
+    id: "review",
+    kind: "select",
     prompt: "Ready to generate and fine‑tune?",
+    help: "You can still edit after",
     options: ["Yes — continue", "No — restart"],
-    next: (v) => v.startsWith("Yes") ? "generate" : "name"
-  }
+    next: (v) => (String(v).startsWith("Yes") ? "generate" : "name"),
+  },
 ];
