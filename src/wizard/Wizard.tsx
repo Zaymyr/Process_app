@@ -16,7 +16,7 @@ export default function Wizard({ onDone }: WizardProps) {
 
   const handleNext = (value: any) => {
     // validate
-    const err = q.validate?.(value);
+    const err = q.validate?.(value, ctx);
     if (err) { setError(err); return; }
     setError(undefined);
 
