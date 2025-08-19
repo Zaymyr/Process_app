@@ -68,8 +68,6 @@ onAnswer: (rows: any[], ctx) => {
       label: String(r?.Action || "").trim(),
       laneId,
     };
-  });
-},
 
     },
     next: "metrics"
