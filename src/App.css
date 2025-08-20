@@ -166,6 +166,15 @@ body {
 .btn.ghost.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 .btn.ghost.danger:hover { background: #fee2e2; border-color: #fca5a5; }
 
+/* Ensure buttons have consistent height and alignment */
+.btn {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
 /* Generate button spans full row but stays neat */
 .generate-section { text-align: center; }
 .generate-btn { width: 100%; max-width: 480px; }

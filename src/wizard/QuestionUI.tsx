@@ -32,6 +32,7 @@ export function QuestionUI({ q, onNext, lanes, error }: QuestionUIProps) {
     if (input && input.value.trim()) {
       setMultiValues(prev => [...prev, input.value.trim()]);
       input.value = "";
+      input.focus(); // Keep focus on input for easy multiple additions
     }
   };
 
