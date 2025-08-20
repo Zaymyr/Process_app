@@ -62,7 +62,7 @@ export function QuestionUI({ q, onNext, lanes, error }: QuestionUIProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
+    <form id={`question-form-${q.id}`} onSubmit={handleSubmit} style={{ marginTop: 16 }}>
       <h4 style={{ margin: "0 0 12px 0", fontSize: "1.1em", fontWeight: 600 }}>
         {q.prompt}
       </h4>
@@ -180,12 +180,6 @@ export function QuestionUI({ q, onNext, lanes, error }: QuestionUIProps) {
           {error}
         </div>
       )}
-
-      <div style={{ marginTop: 16 }}>
-        <button type="submit" className="btn primary">
-          Next
-        </button>
-      </div>
     </form>
   );
 }
