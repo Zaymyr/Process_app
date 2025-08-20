@@ -74,19 +74,15 @@ export default function Wizard({ onDone }: WizardProps) {
 
   return (
     <section className="card" style={{ minHeight: 260 }}>
-      <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-        <h3 style={{ margin: 0 }}>Setup wizard</h3>
-        <span className="hint">Step {questions.findIndex(x => x.id === qId) + 1} / {questions.length}</span>
-      </div>
+      <h3 style={{ margin: 0 }}>Setup wizard</h3>
 
       {q.help && <p className="hint" style={{ marginTop: -8 }}>{q.help}</p>}
 
       <QuestionUI q={q} onNext={handleNext} lanes={ctx.m.lanes.map(l => l.name)} error={error} />
 
-      <div className="row" style={{ justifyContent: "space-between", marginTop: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
         <button className="btn ghost" type="button" onClick={handleBack} disabled={hist.length <= 1}>Back</button>
-        {/* optional debug chip */}
-        <span className="hint">Current: <code>{qId}</code></span>
+        <span className="hint">Step {questions.findIndex(x => x.id === qId) + 1} / {questions.length}</span>
       </div>
     </section>
   );

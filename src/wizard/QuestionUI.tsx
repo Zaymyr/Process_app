@@ -73,7 +73,7 @@ export function QuestionUI({ q, onNext, lanes, error }: QuestionUIProps) {
             className="ctl"
             value={value}
             onChange={e => setValue(e.target.value)}
-            placeholder="Enter your answer..."
+            placeholder={q.help || "Enter your answer..."}
             autoFocus
           />
         </div>
